@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="中文">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/hexo-blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/hexo-blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/hexo-blog/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/hexo-blog/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/hexo-blog/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/hexo-blog/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/hexo-blog/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="THomson,杨涛，Blog" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="背景1.刚学jQuery的时候做过一个小游戏，用到了window.location.reload()这个API进行页面刷新。但因为缓存问题出现了bug，而当时的我甚至都不知道缓存，折腾许久才解决，把上线时间推迟了几天 2.接手已经上线运营的易道网球时，一个用户出现了bug，紧急调整之后。但由于用户浏览器缓存的问题，仍然">
+<meta property="og:type" content="article">
+<meta property="og:title" content="缓存踩坑记录--缓存控制问题">
+<meta property="og:url" content="https://jeromeyangtao.github.io/hexo-blog/2017/04/15/缓存踩坑记录--缓存控制问题/index.html">
+<meta property="og:site_name" content="杨涛的个人博客">
+<meta property="og:description" content="背景1.刚学jQuery的时候做过一个小游戏，用到了window.location.reload()这个API进行页面刷新。但因为缓存问题出现了bug，而当时的我甚至都不知道缓存，折腾许久才解决，把上线时间推迟了几天 2.接手已经上线运营的易道网球时，一个用户出现了bug，紧急调整之后。但由于用户浏览器缓存的问题，仍然报错。最后通过产品经理让运营指导用户清除缓存解决…沟通成本时间成本耗费巨大，大家">
+<meta property="og:locale" content="中文">
+<meta property="og:updated_time" content="2017-11-23T15:02:34.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="缓存踩坑记录--缓存控制问题">
+<meta name="twitter:description" content="背景1.刚学jQuery的时候做过一个小游戏，用到了window.location.reload()这个API进行页面刷新。但因为缓存问题出现了bug，而当时的我甚至都不知道缓存，折腾许久才解决，把上线时间推迟了几天 2.接手已经上线运营的易道网球时，一个用户出现了bug，紧急调整之后。但由于用户浏览器缓存的问题，仍然报错。最后通过产品经理让运营指导用户清除缓存解决…沟通成本时间成本耗费巨大，大家">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/hexo-blog/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jeromeyangtao.github.io/hexo-blog/2017/04/15/缓存踩坑记录--缓存控制问题/"/>
+
+
+
+
+
+  <title>缓存踩坑记录--缓存控制问题 | 杨涛的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="中文">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/hexo-blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">杨涛的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/hexo-blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-关于">
+          <a href="/hexo-blog/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/hexo-blog/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/hexo-blog/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/hexo-blog/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jeromeyangtao.github.io/hexo-blog/hexo-blog/2017/04/15/缓存踩坑记录--缓存控制问题/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="杨涛">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/hexo-blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杨涛的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">缓存踩坑记录--缓存控制问题</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-04-15T00:00:00+08:00">
+                2017-04-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/hexo-blog/categories/http/" itemprop="url" rel="index">
+                    <span itemprop="name">http</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/hexo-blog/2017/04/15/缓存踩坑记录--缓存控制问题/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/04/15/缓存踩坑记录--缓存控制问题/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>1.刚学jQuery的时候做过一个小游戏，用到了window.location.reload()这个API进行页面刷新。但因为缓存问题出现了bug，而当时的我甚至都不知道缓存，折腾许久才解决，把上线时间推迟了几天</p>
+<p>2.接手已经上线运营的<strong>易道网球</strong>时，一个用户出现了bug，紧急调整之后。但由于用户浏览器缓存的问题，仍然报错。最后通过产品经理让运营指导用户清除缓存解决…沟通成本时间成本耗费巨大，大家都不爽</p>
+<p>两次被坑之后觉得以后痛定思痛，杜绝以后再出现类似情况，学习缓存控制相关知识后，记录下比较实用的解决方案</p>
+<h3 id="URL-查询参数"><a href="#URL-查询参数" class="headerlink" title="URL + 查询参数"></a>URL + 查询参数</h3><p>在我的另一篇博客<a href="http://www.jianshu.com/p/0065b43ae5fb" target="_blank" rel="noopener">查询字符串踩坑记录</a>中提到过，查询字符串不同意味着URL不一样，就不是同一份资源。不是同一份资源浏览器就会向服务器发起请求，让服务器返回对应的资源，<strong>不会再使用缓存的资源</strong>。这样就达到了控制缓存的目的。</p>
+<p>具体操作就是<strong>在引用的CSS和JS文件名后面加上查询参数，每次更改资源内容就更改查询参数</strong></p>
+<p>下面是具体例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&lt;link rel=&quot;stylesheet&quot; href=&quot;./css/style.css?version=1&quot;&gt;</span><br><span class="line">&lt;script src=&quot;./js/index.js?version=1&quot;&gt;&lt;/script&gt;</span><br></pre></td></tr></table></figure></p>
+<p>每次更改JS和CSS文件，改变version后面的数值就能保证用户请求的是最新的资源了。<br>我们也可以选择不用具体数值而是用一个随机数，这样就可以保证用户每次请求的都是最新资源了。</p>
+<p>这种控制缓存的方法在几年前比较流行，简单实用。</p>
+<h3 id="cache-control"><a href="#cache-control" class="headerlink" title="cache-control"></a>cache-control</h3><p>现在http消息头中设置<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cacheControl:no-cache</span><br></pre></td></tr></table></figure></p>
+<p>可以让每次请求都不使用缓存的资源<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cacheControl:public,max-age=3600</span><br></pre></td></tr></table></figure></p>
+<p>也可以设置一个使用最大时间内的缓存。在这个例子中，3600毫秒前缓存可以使用，3600毫秒后就不再使用该缓存，向服务器请求最新的资源</p>
+<p>在http消息头中，类似的控制缓存的字段还有expire和last-modified。顾名思义就是通过判断过期时间和最后更新时间来就决定是否使用缓存。但都不是特别推荐使用。</p>
+<p><strong>expire</strong>使用的是绝对时间，如果用户更改了自己计算机上的时间，可能会出现一些意想不到的情况。<br><strong>last-modified</strong>则主要是是因为http协议本身对他的描述就比较模糊，各浏览器对他的理解有所不同，也可能会遇到麻烦。</p>
+<p>值得一提的是cache-control是从http1.1开始支持的</p>
+<h3 id="ETag"><a href="#ETag" class="headerlink" title="ETag"></a>ETag</h3><p>ETag也是http消息头的一个字段。<br>具体做法是：服务器在第一次返回页面资源的时候附带上一个ETag值，之后浏览器每次请求都带上ETag，如果ETag和服务器一样，就使用缓存资源，否则返回最新资源。在服务端更新资源之后修改ETag值即可</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>URL+查询字符串：纯前端操作，现在不流行<br>cache-control，ETag：现在的流行做法，http相关，与后端合作。cache-control节省了下载和请求，ETag节省了下载，仍需请求</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/hexo-blog/2017/03/22/常用的meta标签/" rel="next" title="常用的meta标签">
+                <i class="fa fa-chevron-left"></i> 常用的meta标签
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/hexo-blog/2017/04/22/数组去重/" rel="prev" title="数组去重">
+                数组去重 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/04/15/缓存踩坑记录--缓存控制问题/"
+           data-title="缓存踩坑记录--缓存控制问题" data-url="https://jeromeyangtao.github.io/hexo-blog/2017/04/15/缓存踩坑记录--缓存控制问题/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Inhaltsverzeichnis
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Übersicht
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">杨涛</p>
+              <p class="site-description motion-element" itemprop="description">记录学习，记录生活</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/hexo-blog/archives">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">Kategorien</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/JeromeYangtao" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#背景"><span class="nav-number">1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#URL-查询参数"><span class="nav-number">2.</span> <span class="nav-text">URL + 查询参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#cache-control"><span class="nav-number">3.</span> <span class="nav-text">cache-control</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ETag"><span class="nav-number">4.</span> <span class="nav-text">ETag</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">杨涛</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/hexo-blog/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/hexo-blog/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/hexo-blog/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/hexo-blog/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/hexo-blog/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/hexo-blog/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/hexo-blog/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

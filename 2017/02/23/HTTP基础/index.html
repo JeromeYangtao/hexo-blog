@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="中文">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/hexo-blog/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/hexo-blog/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/hexo-blog/css/main.css?v=5.1.3" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/hexo-blog/images/apple-touch-icon-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/hexo-blog/images/favicon-32x32-next.png?v=5.1.3">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/hexo-blog/images/favicon-16x16-next.png?v=5.1.3">
+
+
+  <link rel="mask-icon" href="/hexo-blog/images/logo.svg?v=5.1.3" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="THomson,杨涛，Blog" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="##1.概念 #####1.1定义  超文本传输协议（英文：HyperText Transfer Protocol，缩写：HTTP）是一种通信协议，它允许将超文本标记语言(HTML)文档从Web服务器传送到客户端的浏览器。   它是一个应用程序协议，承载于TCP之上 由请求和响应构成，是一个标准的客户端服务器模型   ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HTTP基础">
+<meta property="og:url" content="https://jeromeyangtao.github.io/hexo-blog/2017/02/23/HTTP基础/index.html">
+<meta property="og:site_name" content="杨涛的个人博客">
+<meta property="og:description" content="##1.概念 #####1.1定义  超文本传输协议（英文：HyperText Transfer Protocol，缩写：HTTP）是一种通信协议，它允许将超文本标记语言(HTML)文档从Web服务器传送到客户端的浏览器。   它是一个应用程序协议，承载于TCP之上 由请求和响应构成，是一个标准的客户端服务器模型   #####1.2历史作为Web文档传输协议的HTTP，它的版本更新十分缓慢，目前">
+<meta property="og:locale" content="中文">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-d1ebbc93b5e52095.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-9b0bb603415a0a94.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-6848462e03018fe9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-d24dbe8ef0e7c786.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-68273ca250e91fb7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-3c2795fe63d2fe75.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/3474707-2c59feb4f1c1c149.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-11-23T07:54:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="HTTP基础">
+<meta name="twitter:description" content="##1.概念 #####1.1定义  超文本传输协议（英文：HyperText Transfer Protocol，缩写：HTTP）是一种通信协议，它允许将超文本标记语言(HTML)文档从Web服务器传送到客户端的浏览器。   它是一个应用程序协议，承载于TCP之上 由请求和响应构成，是一个标准的客户端服务器模型   #####1.2历史作为Web文档传输协议的HTTP，它的版本更新十分缓慢，目前">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/3474707-d1ebbc93b5e52095.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/hexo-blog/',
+    scheme: 'Muse',
+    version: '5.1.3',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://jeromeyangtao.github.io/hexo-blog/2017/02/23/HTTP基础/"/>
+
+
+
+
+
+  <title>HTTP基础 | 杨涛的个人博客</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="中文">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/hexo-blog/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">杨涛的个人博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-主页">
+          <a href="/hexo-blog/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            主页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-关于">
+          <a href="/hexo-blog/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-标签">
+          <a href="/hexo-blog/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-分类">
+          <a href="/hexo-blog/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-归档">
+          <a href="/hexo-blog/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jeromeyangtao.github.io/hexo-blog/hexo-blog/2017/02/23/HTTP基础/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="杨涛">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/hexo-blog/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="杨涛的个人博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">HTTP基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Veröffentlicht am</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2017-02-23T00:00:00+08:00">
+                2017-02-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">in</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/hexo-blog/categories/http/" itemprop="url" rel="index">
+                    <span itemprop="name">http</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/hexo-blog/2017/02/23/HTTP基础/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2017/02/23/HTTP基础/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>##1.概念</p>
+<p>#####1.1定义</p>
+<blockquote>
+<p><em>超文本传输协议</em>（英文：<em>HyperText Transfer Protocol</em>，缩写：<strong>HTTP</strong>）是一种通信协议，它允许将超文本标记语言(HTML)文档从Web服务器传送到客户端的浏览器。</p>
+</blockquote>
+<ul>
+<li>它是一个应用程序协议，承载于TCP之上</li>
+<li>由请求和响应构成，是一个标准的客户端服务器模型</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/3474707-d1ebbc93b5e52095.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>#####1.2历史<br>作为Web文档传输协议的HTTP，它的版本更新十分缓慢，目前只更新了三个版本：</p>
+<ul>
+<li>HTTP/0.9</li>
+<li>HTTP/1.0</li>
+<li>HTTP/1.1</li>
+</ul>
+<p>#####1.3重要性<br>HTTP协议是整个Web基础，许多应用都离不开对HTTP协议的认识：</p>
+<ul>
+<li>WebService = HTTP + XML</li>
+<li>Reset = HTTP + Json</li>
+<li>API的实现：HTTP +Json/XML</li>
+<li>采集，小偷站</li>
+<li>QQ，迅雷等桌面应用软件</li>
+</ul>
+<p>##2.TCP/IP</p>
+<p>#####2.1什么是协议？<br>协议是指计算机网络中，两台计算机进行通信，所必须遵循的规定或规则</p>
+<p>计算机网络中有各种各样的协议，比如TCP协议，IP协议，FTP协议等等。像这样把与互联网相关联的协议集合起来，就称为TCP/IP协议族。<br><img src="http://upload-images.jianshu.io/upload_images/3474707-9b0bb603415a0a94.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>#####2.2分层管理<br>TCP/IP协议族最重要的一点就是分层。按层次分为以下四层：</p>
+<ul>
+<li><strong>应用层</strong>：<br>负责处理特定的应用程序，TCP/IP协议族内预存了各类通用的应用服务。<br>比如FTP，DNS等等，HTTP也在该层。</li>
+<li><strong>传输层</strong>：<br>对上层应用层提供处于网络连接中两台计算机之间的数据传输。该层有两个不同的协议：TCP和UDP。</li>
+<li><strong>网络层</strong>：<br>处理网络上流动的数据包。<br>该层协议有：IP，ICMP，IGMP。</li>
+<li><strong>数据链路层</strong>：<br>处理连接网络的硬件部分。<br>包括操作系统，硬件设备驱动，网卡，光纤等。<br>#####2.2通信传输流程</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/3474707-6848462e03018fe9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>##3.TCP/IP和DNS与HTTP的关系</p>
+<p>#####3.1 IP<br>Internet Protocol,网际协议，位于网络层<br>作用：<br>把各种数据包传输给对方。如果要保证传输到对方那里，需要满足各种条件，其中最重要的是<strong>IP</strong>地址和<strong>MAC</strong>地址。</p>
+<ul>
+<li>IP地址：指明了节点被分配到的地址</li>
+<li>MAC地址：网卡所属的固定地址</li>
+<li>区别：IP地址可更换，MAC地址基本上不会变更</li>
+</ul>
+<p>使用ARP协议凭借MAC地址进行通信：<br>ARP是一种用于解析地址的协议，根据通信方的IP地址就可以反查出对应的MAC地址</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3474707-d24dbe8ef0e7c786.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>#####3.2 TCP<br>Transmission Control Protocal,传输控制协议，位于控制层。<br>作用：<br>提供可靠的字节流服务。<br>如何保证可靠的服务？<br>采用三次握手策略</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3474707-68273ca250e91fb7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>#####3.3 DNS<br>Domain Name System,域名系统，位于应用层<br>作用：<br>提供域名到IP地址之间的解析服务。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3474707-3c2795fe63d2fe75.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>#####3.4 几种协议的联系</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/3474707-2c59feb4f1c1c149.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>##4.URI和URL</p>
+<p>#####4.1定义</p>
+<blockquote>
+<p><strong>统一资源标识符</strong>（英语：Uniform Resource Identifier，或<strong>URI</strong>)是一个用于<a href="https://zh.wikipedia.org/wiki/%E6%A0%87%E8%AF%86" target="_blank" rel="noopener">标识</a>某一互联网资源名称的字符串</p>
+<p><strong>统一资源定位符</strong>（或称<strong>统一资源定位器</strong>/<strong>定位地址</strong>、<strong>URL地址</strong>等，英语：Uniform / Universal Resource Locator，常缩写为<strong>URL</strong>），有时也被俗称为<strong>网页地址</strong>（<strong>网址</strong>）。</p>
+</blockquote>
+<p>#####4.2URI和URL的关系<br>URI用字符串标识某一互联网资源，而URL表示资源的地点(资源所处的位置)。由此可见，URL是URI的子集。</p>
+<p>URI由两个主要子集构成：URL和URN</p>
+<p>#####4.3URI的格式<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://user:pass@www.example.com:80/home/index.html?age=11#mask</span><br></pre></td></tr></table></figure></p>
+<p>http：协议方案名<br>user:pass：登陆信息(认证)<br>www.example.com：服务器地址<br>80：端口号<br>/home/index.html：文件路径<br>age=11：查询字符串<br>mask：片段标识符</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/hexo-blog/2017/02/22/模板/" rel="next" title="Node.js初学笔记">
+                <i class="fa fa-chevron-left"></i> Node.js初学笔记
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/hexo-blog/2017/02/27/git的基本使用/" rel="prev" title="git的基本使用">
+                git的基本使用 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+    <div class="comments" id="comments">
+      <div class="ds-thread" data-thread-key="2017/02/23/HTTP基础/"
+           data-title="HTTP基础" data-url="https://jeromeyangtao.github.io/hexo-blog/2017/02/23/HTTP基础/">
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">杨涛</p>
+              <p class="site-description motion-element" itemprop="description">记录学习，记录生活</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/hexo-blog/archives">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">Artikel</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">8</span>
+                  <span class="site-state-item-name">Kategorien</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          <div class="links-of-author motion-element">
+            
+              
+                <span class="links-of-author-item">
+                  <a href="https://github.com/JeromeYangtao" target="_blank" title="GitHub">
+                    
+                      <i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+            
+          </div>
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">杨涛</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Erstellt mit  <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.3</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/hexo-blog/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/hexo-blog/js/src/utils.js?v=5.1.3"></script>
+
+  <script type="text/javascript" src="/hexo-blog/js/src/motion.js?v=5.1.3"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/hexo-blog/js/src/scrollspy.js?v=5.1.3"></script>
+<script type="text/javascript" src="/hexo-blog/js/src/post-details.js?v=5.1.3"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/hexo-blog/js/src/bootstrap.js?v=5.1.3"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"your-duoshuo-shortname"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/hexo-blog/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/hexo-blog/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
